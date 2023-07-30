@@ -140,12 +140,8 @@ func FLBPluginInit(ctx unsafe.Pointer) int {
 }
 
 //export FLBPluginFlush
-func FLBPluginFlush(data unsafe.Pointer, length C.int, tag *C.char) int {
+func FLBPluginFlush(data unsafe.Pointer, length C.int) int {
 	ctx := context.Background()
-	tagname := ""
-	if tag == nil {
-		tagname = C.GoString(tag)
-	}
 
 	// Create Fluent Bit decoder
 	dec := wrapper.NewDecoder(data, int(length))
@@ -153,14 +149,12 @@ func FLBPluginFlush(data unsafe.Pointer, length C.int, tag *C.char) int {
 	// Iterate Records
 	for {
 		// Extract Record
-		ret, ts, record := wrapper.GetRecord(dec)
+		ret, _, record := wrapper.GetRecord(dec)
 		if ret != 0 { // don't rest
 			break
 		}
-		timestamp := ts.(output.FLBTime)
-		for k, v := range record {
-			//fmt.Printf("[%s] %s %s %v \n", tagname, timestamp.String(), k, v)
-			_, _, _ = k, timestamp, tagname
+
+		for _, v := range record {
 			results = append(results, plugin.Send(ctx, interfaceToBytes(v)))
 		}
 	}

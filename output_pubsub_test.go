@@ -79,7 +79,7 @@ func TestFLBPluginFlush(t *testing.T) {
 	if os.Getenv("PROJECT_ID") == "" || os.Getenv("TOPIC_NAME") == "" {
 		return
 	}
-	ok := FLBPluginFlush(nil, 0, nil)
+	ok := FLBPluginFlush(nil, 0)
 	assert.Equal(output.FLB_OK, ok)
 
 	projectId := os.Getenv("PROJECT_ID")
